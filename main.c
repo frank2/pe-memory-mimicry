@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
    uintptr_t valloc_base = (uintptr_t)VirtualAlloc(NULL, nt_headers->OptionalHeader.SizeOfImage, MEM_RESERVE, PAGE_READWRITE);
    assert(valloc_base != 0);
 
-   uint8_t *valloc_headers = (uint8_t *)VirtualAlloc((LPVOID)valloc_base, nt_headers->OptionalHeader.SizeOfHeaders, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+   uint8_t *valloc_headers = (uint8_t *)VirtualAlloc((LPVOID)valloc_base, nt_headers->OptionalHeader.SizeOfHeaders, MEM_COMMIT, PAGE_READWRITE);
    assert(valloc_headers != NULL);
    memcpy(valloc_headers, base_u8, nt_headers->OptionalHeader.SizeOfHeaders);
 
@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
             sect_protect = PAGE_READWRITE;
       }
          
-      uint8_t *valloc_section = (uint8_t *)VirtualAlloc((LPVOID)(valloc_base+section->VirtualAddress), section->Misc.VirtualSize, MEM_COMMIT | MEM_RESERVE, sect_protect);
+      uint8_t *valloc_section = (uint8_t *)VirtualAlloc((LPVOID)(valloc_base+section->VirtualAddress), section->Misc.VirtualSize, MEM_COMMIT, sect_protect);
       assert(valloc_section != NULL);
       memcpy(valloc_section, &base_u8[section->VirtualAddress], section->Misc.VirtualSize);
    }
