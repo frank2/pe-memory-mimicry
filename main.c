@@ -34,7 +34,7 @@ VOID WINAPI get_fresh_image(PVOID instance, DWORD reason, PVOID reserved) {
 #pragma comment(linker, "/INCLUDE:tls_callback")
 #pragma const_seg(push)
 #pragma const_seg(".CRT$XLAAA")
-extern "C" const PIMAGE_TLS_CALLBACK tls_callback = get_fresh_image;
+const PIMAGE_TLS_CALLBACK tls_callback = get_fresh_image;
 #pragma const_seg(pop)
 
 void relocate_image(uint8_t *image, uintptr_t from, uintptr_t to) {
@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
    PIMAGE_SECTION_HEADER section_table = (PIMAGE_SECTION_HEADER)&base_u8[dos_header->e_lfanew+sizeof(DWORD)+sizeof(PIMAGE_FILE_HEADER)+nt_headers->FileHeader.SizeOfOptionalHeader];
 
    uintptr_t valloc_base = (uintptr_t)VirtualAlloc(NULL, nt_headers->OptionalHeader.SizeOfImage, MEM_RESERVE, PAGE_READWRITE);
-   assert(valloc_base != NULL);
+   assert(valloc_base != 0);
 
    uint8_t *valloc_headers = (uint8_t *)VirtualAlloc((LPVOID)valloc_base, nt_headers->OptionalHeader.SizeOfHeaders, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
    assert(valloc_headers != NULL);
