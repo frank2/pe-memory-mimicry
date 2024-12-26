@@ -6,9 +6,9 @@
 #include <assert.h>
 #include <windows.h>
 
-#define VA_TO_RVA(base, va) (((std::uintptr_t)va) - ((std::uintptr_t)base))
+#define VA_TO_RVA(base, va) (((uintptr_t)va) - ((uintptr_t)base))
 
-uint8_t FRESH_IMAGE = NULL;
+uint8_t *FRESH_IMAGE = NULL;
 bool VALLOC_STATE = false;
 
 void exit_thread(void) {
@@ -52,7 +52,7 @@ void relocate_image(uint8_t *image, uintptr_t from, uintptr_t to) {
       WORD *entry_table = (WORD *)&base_reloc[sizeof(IMAGE_BASE_RELOCATION)];
       size_t entries = (base_reloc_block->SizeOfBlock-sizeof(IMAGE_BASE_RELOCATION))/sizeof(WORD);
 
-      for (std::size_t i=0; i<entries; ++i) {
+      for (size_t i=0; i<entries; ++i) {
          DWORD reloc_rva = base_reloc_block->VirtualAddress + (entry_table[i] & 0xFFF);
          uintptr_t *reloc_ptr = (uintptr_t *)&image[reloc_rva];
                
@@ -104,7 +104,7 @@ void load_image(uint8_t *base_u8) {
       void (**callbacks)(PVOID, DWORD, PVOID) = (void (**)(PVOID, DWORD, PVOID))tls_dir->AddressOfCallBacks;
 
       while (*callbacks != NULL) {
-         (*callbacks)(base_u8, DLL_PROCESS_ATTACH, nullptr);
+         (*callbacks)(base_u8, DLL_PROCESS_ATTACH, NULL);
          ++callbacks;
       }
    }
@@ -136,10 +136,10 @@ int main(int argc, char *argv[]) {
       if ((section->Characteristics & IMAGE_SCN_MEM_EXECUTE) != 0) {
          sect_protect = PAGE_EXECUTE;
 
-         if ((section->Characteristics & IMAGE_SCN_READ) != 0) {
+         if ((section->Characteristics & IMAGE_SCN_MEM_READ) != 0) {
             sect_protect = PAGE_EXECUTE_READ;
 
-            if ((section->Characteristics & IMAGE_SCN_WRITE) != 0) {
+            if ((section->Characteristics & IMAGE_SCN_MEM_WRITE) != 0) {
                sect_protect = PAGE_EXECUTE_READWRITE;
             }
          }
