@@ -10,6 +10,7 @@
 
 #pragma comment(lib, "ktmw32.lib")
 #pragma comment(lib, "ntdll.lib")
+#pragma comment(lib, "psapi.lib")
 
 extern uint8_t SHEEP_MONITOR[];
 
@@ -168,9 +169,9 @@ int main(int argc, char *argv[]) {
    config.max_sheep = 10;
 
    uintptr_t config_base = (uintptr_t)VirtualAllocEx(explorer_proc, NULL, sizeof(SheepConfig), MEM_COMMIT, PAGE_READWRITE);
-   DWORD bytes_written;
+   SIZE_T bytes_written;
    assert(config_base != 0);
-   assert(WriteProcessMemory(explorer_proc, config_base, &config, sizeof(SheepConfig), &bytes_written));
+   assert(WriteProcessMemory(explorer_proc, (LPVOID)config_base, &config, sizeof(SheepConfig), &bytes_written));
 
    DWORD loader_rva = get_export_rva(&SHEEP_MONITOR[0], "load_image");
    assert(loader_rva != 0);
