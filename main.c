@@ -70,7 +70,7 @@ HANDLE create_sheep_section(void) {
 
    HANDLE sheep_section;
    assert(NtCreateSection(&sheep_section,
-                          SECTION_MAP_EXECUTE,
+                          SECTION_ALL_ACCESS,
                           NULL,
                           0,
                           PAGE_READONLY,
