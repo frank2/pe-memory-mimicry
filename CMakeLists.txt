@@ -8,7 +8,8 @@ add_subdirectory(sheep_monitor)
 add_dependencies(memory_mimicry binobj sheep_monitor)
 add_custom_command(TARGET memory_mimicry
   PRE_BUILD
-  COMMAND powershell -ExecutionPolicy bypass -Command [=[Write-Output "#pragma once\`n#define SHEEP_MONITOR_SIZE $$\(Get-ChildItem '$<TARGET_FILE:sheep_monitor>' | Measure-Object -Property Length -Sum\).Sum" | Out-File -FilePath "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/sheep_monitor.h"]=])
+  COMMAND powershell -ExecutionPolicy bypass -File "${CMAKE_CURRENT_SOURCE_DIR}/filesize.ps1" -Filename "$<TARGET_FILE:sheep_monitor>" -Label SHEEP_MONITOR_SIZE -Output "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/sheep_monitor.h"
+  VERBATIM)
 add_custom_command(TARGET memory_mimicry
   PRE_BUILD
   COMMAND "$<TARGET_FILE:binobj>" SHEEP_MONITOR 1 "$<TARGET_FILE:sheep_monitor>" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/sheep_monitor.obj"
