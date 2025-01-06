@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
    uintptr_t remote_sheep_base = 0;
    ULONG remote_sheep_size = 0;
    assert(NtMapViewOfSection(sheep_section,
-                             explorer_proc,
+                             GetCurrentProcess(), // explorer_proc,
                              (PVOID *)&remote_sheep_base,
                              0,
                              0,
