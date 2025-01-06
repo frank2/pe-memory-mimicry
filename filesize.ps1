@@ -3,4 +3,4 @@ param([string]$Filename,
       [string]$Output)
 
 $filesize = (Get-Item $Filename | Select-Object Length).Length;
-Write-Output "#pragma once`n#define $Label $filesize" | Out-File $Output
+Write-Output "#pragma once`n#define $Label $filesize`n" | Out-File $Output
