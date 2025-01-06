@@ -12,8 +12,7 @@ add_custom_command(TARGET memory_mimicry
   VERBATIM)
 add_custom_command(TARGET memory_mimicry
   PRE_BUILD
-  COMMAND "$<TARGET_FILE:binobj>" SHEEP_MONITOR 1 "$<TARGET_FILE:sheep_monitor>" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/sheep_monitor.obj"
-  VERBATIM)
+  COMMAND "$<TARGET_FILE:binobj>" SHEEP_MONITOR 1 "$<TARGET_FILE:sheep_monitor>" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/sheep_monitor.obj")
 
 target_include_directories(memory_mimicry PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/sheep_monitor/$<CONFIG>")
 target_link_libraries(memory_mimicry "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/sheep_monitor.obj")
