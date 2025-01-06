@@ -150,17 +150,17 @@ int main(int argc, char *argv[]) {
 
    PIMAGE_NT_HEADERS64 sheep_nt = get_nt_headers(&SHEEP_MONITOR[0]);
    HANDLE sheep_section = create_sheep_section();
-   uintptr_t remote_sheep_base = 0;
-   ULONG remote_sheep_size = 4096;
+   PVOID remote_sheep_base = NULL;
+   ULONG remote_sheep_size = 0;
    assert(NtMapViewOfSection(sheep_section,
                              GetCurrentProcess(), // explorer_proc,
-                             (PVOID *)&remote_sheep_base,
+                             &remote_sheep_base,
                              0,
                              0,
                              NULL,
                              &remote_sheep_size,
                              ViewShare,
-                             MEM_DIFFERENT_IMAGE_BASE_OK,
+                             0, // MEM_DIFFERENT_IMAGE_BASE_OK,
                              PAGE_EXECUTE_WRITECOPY) == STATUS_SUCCESS);
 
    SheepConfig config;
