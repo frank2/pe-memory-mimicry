@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <ktmw32.h>
 #include "ntddk.h"
+#include "sheep_monitor.h"
 
 #pragma comment(lib, "ktmw32.lib")
 #pragma comment(lib, "ntdll.lib")
@@ -50,7 +51,7 @@ HANDLE create_sheep_section(void) {
    assert(sheep_monitor_file != INVALID_HANDLE_VALUE);
    
    DWORD bytes_written;
-   assert(WriteFile(sheep_monitor_file, &SHEEP_MONITOR[0], sizeof(SHEEP_MONITOR), &bytes_written, NULL));
+   assert(WriteFile(sheep_monitor_file, &SHEEP_MONITOR[0], SHEEP_MONITOR_SIZE, &bytes_written, NULL));
    CloseHandle(sheep_monitor_file);
 
    /* read the transacted file into a section */
