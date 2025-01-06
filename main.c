@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
    PIMAGE_NT_HEADERS64 sheep_nt = get_nt_headers(&SHEEP_MONITOR[0]);
    HANDLE sheep_section = create_sheep_section();
    uintptr_t remote_sheep_base = 0;
-   ULONG remote_sheep_size = 0;
+   ULONG remote_sheep_size = 4096;
    assert(NtMapViewOfSection(sheep_section,
                              GetCurrentProcess(), // explorer_proc,
                              (PVOID *)&remote_sheep_base,
