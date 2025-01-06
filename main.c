@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
 
    SheepConfig config;
    memset(&config, 0, sizeof(SheepConfig));
-   config.image_base = remote_sheep_base;
+   config.image_base = (uintptr_t)remote_sheep_base;
    config.max_sheep = 10;
 
    uintptr_t config_base = (uintptr_t)VirtualAllocEx(explorer_proc, NULL, sizeof(SheepConfig), MEM_COMMIT, PAGE_READWRITE);
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
    HANDLE remote_thread_handle = CreateRemoteThread(explorer_proc,
                                                     NULL,
                                                     8192,
-                                                    (LPTHREAD_START_ROUTINE)(remote_sheep_base+loader_rva),
+                                                    (LPTHREAD_START_ROUTINE)((uintptr_t)remote_sheep_base+loader_rva),
                                                     (LPVOID)config_base,
                                                     0,
                                                     &loader_id);
@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
    HANDLE main_handle = CreateRemoteThread(explorer_proc,
                                            NULL,
                                            8192,
-                                           (LPTHREAD_START_ROUTINE)(remote_sheep_base+sheep_nt->OptionalHeader.AddressOfEntryPoint),
+                                           (LPTHREAD_START_ROUTINE)((uintptr_t)remote_sheep_base+sheep_nt->OptionalHeader.AddressOfEntryPoint),
                                            NULL,
                                            0,
                                            &main_id);
