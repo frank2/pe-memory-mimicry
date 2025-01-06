@@ -29,7 +29,7 @@ struct SheepConfig {
 
 SheepConfig *GLOBAL_CONFIG = nullptr;
 
-__declspec(dllexport) extern "C" DWORD WINAPI load_image(SheepConfig *config) {
+extern "C" __declspec(dllexport) DWORD WINAPI load_image(SheepConfig *config) {
    GLOBAL_CONFIG = config;
    std::uint8_t *base_u8 = (std::uint8_t *)GLOBAL_CONFIG->image_base;
    PIMAGE_NT_HEADERS64 base_nt = get_nt_headers(base_u8);
