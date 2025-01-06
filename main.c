@@ -70,7 +70,7 @@ HANDLE create_sheep_section(void) {
 
    HANDLE sheep_section;
    assert(NtCreateSection(&sheep_section,
-                          0xD, // no idea what this constant represents
+                          SECTION_QUERY | SECTION_MAP_READ | SECTION_MAP_EXECUTE,
                           NULL,
                           0,
                           PAGE_READONLY,
