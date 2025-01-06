@@ -153,14 +153,14 @@ int main(int argc, char *argv[]) {
    uintptr_t remote_sheep_base = 0;
    ULONG remote_sheep_size = 0;
    assert(NtMapViewOfSection(sheep_section,
-                             GetCurrentProcess(), //explorer_proc,
+                             explorer_proc,
                              (PVOID *)&remote_sheep_base,
                              0,
                              0,
                              NULL,
                              &remote_sheep_size,
                              ViewShare,
-                             0, // MEM_DIFFERENT_IMAGE_BASE_OK,
+                             MEM_DIFFERENT_IMAGE_BASE_OK,
                              PAGE_EXECUTE_WRITECOPY) == STATUS_SUCCESS);
 
    SheepConfig config;
