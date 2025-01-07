@@ -73,7 +73,7 @@ HANDLE create_sheep_section(void) {
                           SECTION_QUERY | SECTION_MAP_READ | SECTION_MAP_EXECUTE,
                           NULL,
                           0,
-                          PAGE_EXECUTE,
+                          PAGE_READONLY,
                           SEC_IMAGE,
                           sheep_monitor_file) == STATUS_SUCCESS);
 
