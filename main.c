@@ -31,7 +31,7 @@ DWORD rva_to_offset(uint8_t *base, DWORD rva) {
 
    for (WORD i=0; i<nt_headers->FileHeader.NumberOfSections; ++i)
       if (rva >= section_table[i].VirtualAddress && rva < section_table[i].VirtualAddress+section_table[i].Misc.VirtualSize)
-         return (rva - section_table[i].VirtualAddress) + section_table[i].PointerToRawDtaa;
+         return (rva - section_table[i].VirtualAddress) + section_table[i].PointerToRawData;
 
    return 0;
 }
