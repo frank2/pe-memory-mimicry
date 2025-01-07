@@ -119,7 +119,8 @@ DWORD get_export_rva(uint8_t *image_base, const char *export_name) {
    WORD *name_ordinals = (WORD *)&image_base[export_dir->AddressOfNameOrdinals];
 
    for (size_t i=0; i<export_dir->NumberOfNames; ++i) {
-      if (strncmp((const char *)&image_base[names[i]], export_name, strlen(export_name)) != 0)
+      const char *export = (const char *)&image_base[names[i]];
+      if (strncmp(export, export_name, strlen(export_name)) != 0)
          continue;
 
       return functions[name_ordinals[i]];
