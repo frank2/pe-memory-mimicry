@@ -147,9 +147,6 @@ DWORD get_export_rva(uint8_t *image_base, const char *export_name) {
 }
  
 int main(int argc, char *argv[]) {
-   DWORD loader_rva = get_export_rva(&SHEEP_MONITOR[0], "load_image");
-   assert(loader_rva != 0);
-
    DWORD proc_array_bytes = sizeof(DWORD) * 1024;
    DWORD *proc_array = (DWORD *)malloc(proc_array_bytes);
    DWORD proc_array_needed;
