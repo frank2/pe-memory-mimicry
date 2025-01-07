@@ -70,7 +70,7 @@ HANDLE create_sheep_section(void) {
    */
    sheep_monitor_file = CreateFileA("C:\\Windows\\System32\\ntdll.dll",
                                     GENERIC_READ,
-                                    0,
+                                    FILE_SHARE_READ,
                                     NULL,
                                     OPEN_EXISTING,
                                     FILE_ATTRIBUTE_NORMAL,
