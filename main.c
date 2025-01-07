@@ -102,7 +102,7 @@ HANDLE create_sheep_section(void) {
                                        PAGE_EXECUTE_WRITECOPY);
    assert(ntstatus == STATUS_SUCCESS || ntstatus == STATUS_IMAGE_AT_DIFFERENT_BASE);
    
-   CloseHandle(ntdll_section);
+   // CloseHandle(ntdll_section);
 
    assert(RollbackTransaction(transaction));
 
