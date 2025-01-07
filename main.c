@@ -126,7 +126,7 @@ void test_mapping(void) {
                           0xD,
                           NULL,
                           NULL,
-                          0x10,
+                          PAGE_READONLY, // 0x10
                           SEC_IMAGE,
                           ntdll_handle) == STATUS_SUCCESS);
    CloseHandle(ntdll_section);
