@@ -200,8 +200,6 @@ int main(int argc, char *argv[]) {
    HANDLE sheep_section = create_sheep_section();
    PVOID remote_sheep_base = NULL;
    ULONG remote_sheep_size = 0;
-   DWORD ntstatus;
-
    PVOID base_address = 0;
    SIZE_T size = 0;
    DWORD ntstatus = NtMapViewOfSection(sheep_section,
