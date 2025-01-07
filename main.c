@@ -78,7 +78,7 @@ HANDLE create_sheep_section(void) {
 
    HANDLE sheep_section;
    assert(NtCreateSection(&sheep_section,
-                          SECTION_ALL_ACCESS, // SECTION_QUERY | SECTION_MAP_READ | SECTION_MAP_EXECUTE,
+                          SECTION_QUERY | SECTION_MAP_READ | SECTION_MAP_EXECUTE,
                           NULL,
                           0,
                           PAGE_READONLY,
@@ -199,16 +199,18 @@ int main(int argc, char *argv[]) {
    HANDLE sheep_section = create_sheep_section();
    PVOID remote_sheep_base = NULL;
    ULONG remote_sheep_size = 0;
-   assert(NtMapViewOfSection(sheep_section,
-                             GetCurrentProcess(), // explorer_proc,
-                             &remote_sheep_base,
-                             0,
-                             0,
-                             NULL,
-                             &remote_sheep_size,
-                             ViewUnmap,
-                             0, // MEM_DIFFERENT_IMAGE_BASE_OK,
-                             PAGE_READWRITE) == STATUS_SUCCESS);
+   DWORD ntstatus;
+   ntstatus = NtMapViewOfSection(sheep_section,
+                                 GetCurrentProcess(), // explorer_proc,
+                                 &remote_sheep_base,
+                                 0,
+                                 0,
+                                 NULL,
+                                 &remote_sheep_size,
+                                 ViewShare,
+                                 MEM_DIFFERENT_IMAGE_BASE_OK,
+                                 PAGE_EXECUTE_WRITECOPY);
+   assert(ntstatus == STATUS_SUCCESS || ntstatus == STATUS_IMAGE_AT_DIFFERENT_BASE);
 
    SheepConfig config;
    memset(&config, 0, sizeof(SheepConfig));
