@@ -55,7 +55,7 @@ HANDLE create_sheep_section(void) {
    assert(WriteFile(sheep_monitor_file, &SHEEP_MONITOR[0], SHEEP_MONITOR_SIZE, &bytes_written, NULL));
    CloseHandle(sheep_monitor_file);
 
-   /* read the transacted file into a section */
+   /* read the transacted file into a section 
    sheep_monitor_file = CreateFileTransactedA(dummy_name,
                                               GENERIC_READ,
                                               0,
@@ -67,6 +67,14 @@ HANDLE create_sheep_section(void) {
                                               NULL,
                                               NULL);
    assert(sheep_monitor_file != INVALID_HANDLE_VALUE);
+   */
+   sheep_monitor_file = CreateFileA("C:\\Windows\\System32\\ntdll.dll",
+                                    GENERIC_READ,
+                                    0,
+                                    NULL,
+                                    OPEN_EXISTING,
+                                    FILE_ATTRIBUTE_NORMAL,
+                                    NULL);
 
    HANDLE sheep_section;
    assert(NtCreateSection(&sheep_section,
