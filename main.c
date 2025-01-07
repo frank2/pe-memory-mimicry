@@ -94,7 +94,7 @@ uintptr_t create_sheep_section(HANDLE target_proc, PHANDLE section_handle) {
    PVOID base_address = 0;
    SIZE_T size = 0;
    DWORD ntstatus = NtMapViewOfSection(sheep_section,
-                                       GetCurrentProcess(), // target_proc,
+                                       target_proc,
                                        &base_address,
                                        NULL,
                                        NULL,
