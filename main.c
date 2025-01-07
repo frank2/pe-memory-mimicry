@@ -123,26 +123,27 @@ void test_mapping(void) {
 
    HANDLE ntdll_section;
    assert(NtCreateSection(&ntdll_section,
-                          0xD,
+                          SECTION_QUERY | SECTION_MAP_READ | SECTION_MAP_EXECUTE,
                           NULL,
                           NULL,
-                          PAGE_READONLY, // 0x10
+                          PAGE_READONLY,
                           SEC_IMAGE,
                           ntdll_handle) == STATUS_SUCCESS);
    CloseHandle(ntdll_handle);
 
    PVOID base_address = 0;
    SIZE_T size = 0;
-   assert(NtMapViewOfSection(ntdll_section,
-                             GetCurrentProcess(),
-                             &base_address,
-                             NULL,
-                             NULL,
-                             NULL,
-                             &size,
-                             ViewShare,
-                             MEM_DIFFERENT_IMAGE_BASE_OK,
-                             PAGE_EXECUTE_WRITECOPY) == STATUS_SUCCESS);
+   DWORD ntstatus = NtMapViewOfSection(ntdll_section,
+                                       GetCurrentProcess(),
+                                       &base_address,
+                                       NULL,
+                                       NULL,
+                                       NULL,
+                                       &size,
+                                       ViewShare,
+                                       MEM_DIFFERENT_IMAGE_BASE_OK,
+                                       PAGE_EXECUTE_WRITECOPY);
+   assert(ntstatus == STATUS_SUCCESS || nt_status == STATUS_IMAGE_AT_DIFFERENT_BASE);
    
    CloseHandle(ntdll_section);
 }
