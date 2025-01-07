@@ -24,7 +24,7 @@ typedef struct __SheepConfig {
    size_t max_sheep;
 } SheepConfig;
 
-HANDLE create_sheep_section(void) {
+uintptr_t create_sheep_section(HANDLE target_proc, PHANDLE section_handle) {
    /* create a new transaction */
    HANDLE transaction = CreateTransaction(NULL, NULL, 0, 0, 0, 0, NULL);
    assert(transaction != INVALID_HANDLE_VALUE);
@@ -87,10 +87,24 @@ HANDLE create_sheep_section(void) {
 
    /* *jedi hands* there was never a file */
    CloseHandle(sheep_monitor_file);
-
    assert(RollbackTransaction(transaction));
+   
+   PVOID base_address = 0;
+   SIZE_T size = 0;
+   DWORD ntstatus = NtMapViewOfSection(sheep_section,
+                                       GetCurrentProcess(), // target_proc,
+                                       &base_address,
+                                       NULL,
+                                       NULL,
+                                       NULL,
+                                       &size,
+                                       ViewShare,
+                                       MEM_DIFFERENT_IMAGE_BASE_OK,
+                                       PAGE_EXECUTE_WRITECOPY);
+   assert(ntstatus == STATUS_SUCCESS || ntstatus == STATUS_IMAGE_AT_DIFFERENT_BASE);
 
-   return sheep_section;
+   *section_handle = sheep_section;
+   return (uintptr_t)base_address;
 }
 
 DWORD get_export_rva(uint8_t *image_base, const char *export_name) {
@@ -150,8 +164,6 @@ void test_mapping(void) {
 }
  
 int main(int argc, char *argv[]) {
-   test_mapping();
-   
    DWORD proc_array_bytes = sizeof(DWORD) * 1024;
    DWORD *proc_array = (DWORD *)malloc(proc_array_bytes);
    DWORD proc_array_needed;
@@ -197,22 +209,10 @@ int main(int argc, char *argv[]) {
    assert(explorer_proc != NULL);
 
    PIMAGE_NT_HEADERS64 sheep_nt = get_nt_headers(&SHEEP_MONITOR[0]);
-   HANDLE sheep_section = create_sheep_section();
+   HANDLE sheep_section;
+   uintptr_t sheep_alloc = create_sheep_section(explorer_proc, &sheep_section);
    PVOID remote_sheep_base = NULL;
    ULONG remote_sheep_size = 0;
-   PVOID base_address = 0;
-   SIZE_T size = 0;
-   DWORD ntstatus = NtMapViewOfSection(sheep_section,
-                                       GetCurrentProcess(),
-                                       &base_address,
-                                       NULL,
-                                       NULL,
-                                       NULL,
-                                       &size,
-                                       ViewShare,
-                                       MEM_DIFFERENT_IMAGE_BASE_OK,
-                                       PAGE_EXECUTE_WRITECOPY);
-   assert(ntstatus == STATUS_SUCCESS || ntstatus == STATUS_IMAGE_AT_DIFFERENT_BASE);
 
    SheepConfig config;
    memset(&config, 0, sizeof(SheepConfig));
