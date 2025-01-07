@@ -140,9 +140,9 @@ void test_mapping(void) {
                              NULL,
                              NULL,
                              &size,
-                             0x1,
-                             0x800000,
-                             0x80) == STATUS_SUCCESS);
+                             ViewShare,
+                             MEM_DIFFERENT_IMAGE_BASE_OK,
+                             PAGE_EXECUTE_WRITECOPY) == STATUS_SUCCESS);
    
    CloseHandle(ntdll_section);
 }
