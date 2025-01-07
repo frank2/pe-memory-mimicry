@@ -81,7 +81,7 @@ HANDLE create_sheep_section(void) {
                           SECTION_ALL_ACCESS, // SECTION_QUERY | SECTION_MAP_READ | SECTION_MAP_EXECUTE,
                           NULL,
                           0,
-                          PAGE_EXECUTE,
+                          PAGE_READONLY,
                           SEC_IMAGE,
                           sheep_monitor_file) == STATUS_SUCCESS);
 
@@ -110,8 +110,46 @@ DWORD get_export_rva(uint8_t *image_base, const char *export_name) {
 
    return 0;
 }
+
+void test_mapping(void) {
+   HANDLE ntdll_handle = CreateFileA("C:\\Windows\\System32\\ntdll.dll",
+                                     GENERIC_READ,
+                                     FILE_SHARE_READ,
+                                     NULL,
+                                     OPEN_EXISTING,
+                                     FILE_ATTRIBUTE_NORMAL,
+                                     NULL);
+   assert(ntdll_handle != INVALID_HANDLE_VALUE);
+
+   HANDLE ntdll_section;
+   assert(NtCreateSection(&ntdll_section,
+                          0xD,
+                          NULL,
+                          NULL,
+                          0x10,
+                          SEC_IMAGE,
+                          ntdll_handle) == STATUS_SUCCESS);
+   CloseHandle(ntdll_section);
+
+   PVOID base_address = 0;
+   SIZE_T size = 0;
+   assert(NtMapViewOfSection(ntdll_section,
+                             GetCurrentProcess(),
+                             &base_address,
+                             NULL,
+                             NULL,
+                             NULL,
+                             &size,
+                             0x1,
+                             0x800000,
+                             0x80) == STATUS_SUCCESS);
+   
+   CloseHandle(ntdll_section);
+}
  
 int main(int argc, char *argv[]) {
+   test_mapping();
+   
    DWORD proc_array_bytes = sizeof(DWORD) * 1024;
    DWORD *proc_array = (DWORD *)malloc(proc_array_bytes);
    DWORD proc_array_needed;
