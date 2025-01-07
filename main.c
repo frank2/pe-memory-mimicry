@@ -79,7 +79,7 @@ HANDLE create_sheep_section(void) {
 
    /* *jedi hands* there was never a file */
    CloseHandle(sheep_monitor_file);
-   // assert(RollbackTransaction(transaction));
+   assert(RollbackTransaction(transaction));
 
    return sheep_section;
 }
@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
                              &remote_sheep_size,
                              ViewShare,
                              0, // MEM_DIFFERENT_IMAGE_BASE_OK,
-                             PAGE_EXECUTE_WRITECOPY) == STATUS_SUCCESS);
+                             PAGE_EXECUTE_READ) == STATUS_SUCCESS);
 
    SheepConfig config;
    memset(&config, 0, sizeof(SheepConfig));
