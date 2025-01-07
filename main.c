@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
                              &remote_sheep_size,
                              ViewShare,
                              0, // MEM_DIFFERENT_IMAGE_BASE_OK,
-                             PAGE_EXECUTE_READ) == STATUS_SUCCESS);
+                             PAGE_READONLY) == STATUS_SUCCESS);
 
    SheepConfig config;
    memset(&config, 0, sizeof(SheepConfig));
