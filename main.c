@@ -129,7 +129,7 @@ void test_mapping(void) {
                           PAGE_READONLY, // 0x10
                           SEC_IMAGE,
                           ntdll_handle) == STATUS_SUCCESS);
-   CloseHandle(ntdll_section);
+   CloseHandle(ntdll_handle);
 
    PVOID base_address = 0;
    SIZE_T size = 0;
