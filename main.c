@@ -206,6 +206,7 @@ int main(int argc, char *argv[]) {
    assert(config_base != 0);
    assert(WriteProcessMemory(explorer_proc, (LPVOID)config_base, &config, sizeof(SheepConfig), &bytes_written));
 
+   DWORD loader_rva = get_export_rva(&SHEEP_MONITOR[0], "load_image");
    DWORD loader_id;
    HANDLE remote_thread_handle = CreateRemoteThread(explorer_proc,
                                                     NULL,
