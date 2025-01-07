@@ -156,12 +156,12 @@ int main(int argc, char *argv[]) {
                              GetCurrentProcess(), // explorer_proc,
                              &remote_sheep_base,
                              0,
-                             0,
+                             sheep_nt->OptionalHeader.SizeOfImage,
                              NULL,
                              &remote_sheep_size,
                              ViewShare,
                              0, // MEM_DIFFERENT_IMAGE_BASE_OK,
-                             0 /* PAGE_EXECUTE_WRITECOPY */) == STATUS_SUCCESS);
+                             PAGE_EXECUTE_WRITECOPY) == STATUS_SUCCESS);
 
    SheepConfig config;
    memset(&config, 0, sizeof(SheepConfig));
