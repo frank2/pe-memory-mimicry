@@ -19,6 +19,23 @@ PIMAGE_NT_HEADERS64 get_nt_headers(uint8_t *base) {
    return (PIMAGE_NT_HEADERS64)&base[dos_header->e_lfanew];
 }
 
+PIMAGE_SECTION_HEADER get_section_table(uint8_t *base) {
+   PIMAGE_DOS_HEADER dos_header = (PIMAGE_DOS_HEADER)base;
+   PIMAGE_NT_HEADERS64 nt_headers = get_nt_headers(base);
+   return (PIMAGE_SECTION_HEADER)&base[dos_header->e_lfanew+sizeof(DWORD)+sizeof(IMAGE_FILE_HEADER)+nt_headers->FileHeader.SizeOfOptionalHeader];
+}
+
+DWORD rva_to_offset(uint8_t *base, DWORD rva) {
+   PIMAGE_NT_HEADERS64 nt_headers = get_nt_headers(base);
+   PIMAGE_SECTION_HEADER section_table = get_section_table(base);
+
+   for (WORD i=0; i<nt_headers->FileHeader.NumberOfSections; ++i)
+      if (rva >= section_table[i].VirtualAddress && rva < section_table[i].VirtualAddress+section_table[i].Misc.VirtualSize)
+         return (rva - section_table[i].VirtualAddress) + section_table[i].PointerToRawDtaa;
+
+   return 0;
+}
+
 typedef struct __SheepConfig {
    uintptr_t image_base;
    size_t max_sheep;
@@ -112,11 +129,11 @@ uintptr_t create_sheep_section(HANDLE target_proc, PHANDLE section_handle) {
 DWORD get_export_rva(uint8_t *image_base, const char *export_name) {
    PIMAGE_NT_HEADERS64 nt_headers = get_nt_headers(image_base);
    PIMAGE_DATA_DIRECTORY export_dir_info = &nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
-   PIMAGE_EXPORT_DIRECTORY export_dir = (PIMAGE_EXPORT_DIRECTORY)&image_base[export_dir_info->VirtualAddress];
+   PIMAGE_EXPORT_DIRECTORY export_dir = (PIMAGE_EXPORT_DIRECTORY)&image_base[rva_to_offset(image_base, export_dir_info->VirtualAddress)];
 
-   DWORD *functions = (DWORD *)&image_base[export_dir->AddressOfFunctions];
-   DWORD *names = (DWORD *)&image_base[export_dir->AddressOfNames];
-   WORD *name_ordinals = (WORD *)&image_base[export_dir->AddressOfNameOrdinals];
+   DWORD *functions = (DWORD *)&image_base[rva_to_offset(image_base, export_dir->AddressOfFunctions)];
+   DWORD *names = (DWORD *)&image_base[rva_to_offset(image_base, export_dir->AddressOfNames)];
+   WORD *name_ordinals = (WORD *)&image_base[rva_to_offset(image_base, export_dir->AddressOfNameOrdinals)];
 
    for (size_t i=0; i<export_dir->NumberOfNames; ++i) {
       const char *export = (const char *)&image_base[names[i]];
