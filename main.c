@@ -143,7 +143,7 @@ void test_mapping(void) {
                                        ViewShare,
                                        MEM_DIFFERENT_IMAGE_BASE_OK,
                                        PAGE_EXECUTE_WRITECOPY);
-   assert(ntstatus == STATUS_SUCCESS || nt_status == STATUS_IMAGE_AT_DIFFERENT_BASE);
+   assert(ntstatus == STATUS_SUCCESS || ntstatus == STATUS_IMAGE_AT_DIFFERENT_BASE);
    
    CloseHandle(ntdll_section);
 }
