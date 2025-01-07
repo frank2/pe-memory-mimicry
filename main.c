@@ -87,6 +87,23 @@ HANDLE create_sheep_section(void) {
 
    /* *jedi hands* there was never a file */
    CloseHandle(sheep_monitor_file);
+
+   PVOID base_address = 0;
+   SIZE_T size = 0;
+   DWORD ntstatus = NtMapViewOfSection(sheep_section,
+                                       GetCurrentProcess(),
+                                       &base_address,
+                                       NULL,
+                                       NULL,
+                                       NULL,
+                                       &size,
+                                       ViewShare,
+                                       MEM_DIFFERENT_IMAGE_BASE_OK,
+                                       PAGE_EXECUTE_WRITECOPY);
+   assert(ntstatus == STATUS_SUCCESS || ntstatus == STATUS_IMAGE_AT_DIFFERENT_BASE);
+   
+   CloseHandle(ntdll_section);
+
    assert(RollbackTransaction(transaction));
 
    return sheep_section;
