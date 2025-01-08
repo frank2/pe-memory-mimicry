@@ -7,6 +7,7 @@
 #include <optional>
 #include <vector>
 #include <windows.h>
+#include <winternl.h>
 #include <psapi.h>
 #include <winhttp.h>
 #pragma comment(lib, "winhttp.lib")
