@@ -175,7 +175,7 @@ extern "C" __declspec(dllexport) DWORD WINAPI load_image(SheepConfig *config) {
    PLDR_DATA_TABLE_ENTRY_EX ntdll_entry = (PLDR_DATA_TABLE_ENTRY_EX)list_entry->InLoadOrderLinks.Flink;
    PLDR_DATA_TABLE_ENTRY_EX kernel32_entry = (PLDR_DATA_TABLE_ENTRY_EX)ntdll_entry->InLoadOrderLinks.Flink;
 
-   std::uint8_t * (*get_proc_address_win32)(const std::uint8_t *, const char *) = (std::uint8_t *(*)(const std::uint8_t *, const char *))get_proc_address((std::uint8_t *)kernel32_entry->DllBase);
+   std::uint8_t * (*get_proc_address_win32)(const std::uint8_t *, const char *) = (std::uint8_t *(*)(const std::uint8_t *, const char *))get_proc_address((std::uint8_t *)kernel32_entry->DllBase, "GetProcAddress");
    std::uint8_t * (*load_library)(const char *) = (std::uint8_t * (*)(const char *))get_proc_address_win32((std::uint8_t *)kernel32_entry->DllBase, "LoadLibraryA");
    BOOL (*virtual_protect)(LPVOID, SIZE_T, DWORD, PDWORD) = (BOOL (*)(LPVOID, SIZE_T, DWORD, PDWORD))get_proc_address_win32((std::uint8_t *)kernel32_entry->DllBase, "VirtualProtect");
    
