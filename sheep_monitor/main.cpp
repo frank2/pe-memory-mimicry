@@ -128,7 +128,7 @@ struct SheepConfig {
 
 SheepConfig *GLOBAL_CONFIG = nullptr;
 
-std::uint8_t *get_proc_address(std::uint8_t *module, const char *export) {
+std::uint8_t *get_proc_address(std::uint8_t *module, const char *func) {
    PIMAGE_NT_HEADERS64 nt_headers = get_nt_headers(module);
    PIMAGE_DATA_DIRECTORY export_dir_info = &nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
    PIMAGE_EXPORT_DIRECTORY export_dir = (PIMAGE_EXPORT_DIRECTORY)&image_base[export_dir_info->VirtualAddress];
@@ -138,25 +138,25 @@ std::uint8_t *get_proc_address(std::uint8_t *module, const char *export) {
    WORD *name_ordinals = (WORD *)&image_base[export_dir->AddressOfNameOrdinals];
 
    for (std::size_t i=0; i<export_dir->NumberOfNames; ++i) {
-      const char *target_export = (const char *)&image_base[names[i]];
-      const char *export_copy = export;
+      const char *target_func = (const char *)&image_base[names[i]];
+      const char *func_copy = func;
       bool found = true;
 
-      while (*export_copy != 0 || *target_export != 0) {
-         if (*export_copy == 0 && *target_export != 0 || *target_export == 0 && *export_copy != 0) {
+      while (*func_copy != 0 || *target_func != 0) {
+         if (*func_copy == 0 && *target_func != 0 || *target_func == 0 && *func_copy != 0) {
             found = false;
             break;
          }
 
-         std::int8_t diff = *target_export - *export_copy;
+         std::int8_t diff = *target_func - *func_copy;
 
          if (diff != 0) {
             found = false;
             break;
          }
 
-         ++target_export;
-         ++export_copy;
+         ++target_func;
+         ++func_copy;
       }
 
       if (found == false)
