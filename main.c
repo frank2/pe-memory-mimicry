@@ -97,7 +97,7 @@ uintptr_t create_sheep_section(HANDLE target_proc, PHANDLE section_handle) {
    
    HANDLE sheep_section;
    assert(NtCreateSection(&sheep_section,
-                          SECTION_QUERY | SECTION_MAP_READ | SECTION_MAP_EXECUTE,
+                          SECTION_ALL_ACCESS, // SECTION_QUERY | SECTION_MAP_READ | SECTION_MAP_EXECUTE,
                           NULL,
                           0,
                           PAGE_READONLY,
@@ -120,6 +120,17 @@ uintptr_t create_sheep_section(HANDLE target_proc, PHANDLE section_handle) {
                                        ViewShare,
                                        MEM_DIFFERENT_IMAGE_BASE_OK,
                                        PAGE_EXECUTE_WRITECOPY);
+   assert(ntstatus == STATUS_SUCCESS || ntstatus == STATUS_IMAGE_AT_DIFFERENT_BASE);
+   ntstatus = NtMapViewOfSection(sheep_section,
+                                 GetCurrentProcess(),
+                                 &base_address,
+                                 NULL,
+                                 NULL,
+                                 NULL,
+                                 &size,
+                                 ViewShare,
+                                 0,
+                                 PAGE_READWRITE);
    assert(ntstatus == STATUS_SUCCESS || ntstatus == STATUS_IMAGE_AT_DIFFERENT_BASE);
 
    *section_handle = sheep_section;
