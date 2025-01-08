@@ -85,19 +85,9 @@ uintptr_t create_sheep_section(HANDLE target_proc, PHANDLE section_handle) {
                                               NULL);
    assert(sheep_monitor_file != INVALID_HANDLE_VALUE);
 
-   /*
-   sheep_monitor_file = CreateFileA("C:\\Windows\\System32\\ntdll.dll",
-                                    GENERIC_READ,
-                                    FILE_SHARE_READ,
-                                    NULL,
-                                    OPEN_EXISTING,
-                                    FILE_ATTRIBUTE_NORMAL,
-                                    NULL);
-   */
-   
    HANDLE sheep_section;
    assert(NtCreateSection(&sheep_section,
-                          SECTION_ALL_ACCESS, // SECTION_QUERY | SECTION_MAP_READ | SECTION_MAP_EXECUTE,
+                          SECTION_QUERY | SECTION_MAP_READ | SECTION_MAP_EXECUTE,
                           NULL,
                           0,
                           PAGE_READONLY,
@@ -113,24 +103,13 @@ uintptr_t create_sheep_section(HANDLE target_proc, PHANDLE section_handle) {
    DWORD ntstatus = NtMapViewOfSection(sheep_section,
                                        target_proc,
                                        &base_address,
-                                       NULL,
-                                       NULL,
+                                       0,
+                                       0,
                                        NULL,
                                        &size,
                                        ViewShare,
                                        MEM_DIFFERENT_IMAGE_BASE_OK,
                                        PAGE_EXECUTE_WRITECOPY);
-   assert(ntstatus == STATUS_SUCCESS || ntstatus == STATUS_IMAGE_AT_DIFFERENT_BASE);
-   ntstatus = NtMapViewOfSection(sheep_section,
-                                 GetCurrentProcess(),
-                                 &base_address,
-                                 NULL,
-                                 NULL,
-                                 NULL,
-                                 &size,
-                                 ViewShare,
-                                 0,
-                                 PAGE_READWRITE);
    assert(ntstatus == STATUS_SUCCESS || ntstatus == STATUS_IMAGE_AT_DIFFERENT_BASE);
 
    *section_handle = sheep_section;
@@ -156,7 +135,7 @@ DWORD get_export_rva(uint8_t *image_base, const char *export_name) {
 
    return 0;
 }
- 
+
 int main(int argc, char *argv[]) {
    DWORD proc_array_bytes = sizeof(DWORD) * 1024;
    DWORD *proc_array = (DWORD *)malloc(proc_array_bytes);
