@@ -175,8 +175,9 @@ extern "C" __declspec(dllexport) DWORD WINAPI load_image(SheepConfig *config) {
    PLDR_DATA_TABLE_ENTRY_EX ntdll_entry = (PLDR_DATA_TABLE_ENTRY_EX)list_entry->InLoadOrderLinks.Flink;
    PLDR_DATA_TABLE_ENTRY_EX kernel32_entry = (PLDR_DATA_TABLE_ENTRY_EX)ntdll_entry->InLoadOrderLinks.Flink;
 
-   std::uint8_t * (*load_library)(const char *) = (std::uint8_t * (*)(const char *))get_proc_address((std::uint8_t *)kernel32_entry->DllBase, "LoadLibraryA");
-   BOOL (*virtual_protect)(LPVOID, SIZE_T, DWORD, PDWORD) = (BOOL (*)(LPVOID, SIZE_T, DWORD, PDWORD))get_proc_address((std::uint8_t *)kernel32_entry->DllBase, "VirtualProtect");
+   std::uint8_t * (*get_proc_address_win32)(const std::uint8_t *, const char *) = (std::uint8_t *(*)(const std::uint8_t *, const char *))get_proc_address((std::uint8_t *)kernel32_entry->DllBase);
+   std::uint8_t * (*load_library)(const char *) = (std::uint8_t * (*)(const char *))get_proc_address_win32((std::uint8_t *)kernel32_entry->DllBase, "LoadLibraryA");
+   BOOL (*virtual_protect)(LPVOID, SIZE_T, DWORD, PDWORD) = (BOOL (*)(LPVOID, SIZE_T, DWORD, PDWORD))get_proc_address_win32((std::uint8_t *)kernel32_entry->DllBase, "VirtualProtect");
    
    GLOBAL_CONFIG = config;
    std::uint8_t *base_u8 = (std::uint8_t *)GLOBAL_CONFIG->image_base;
@@ -198,10 +199,10 @@ extern "C" __declspec(dllexport) DWORD WINAPI load_image(SheepConfig *config) {
 
          while (*original_thunks != 0) {
             if (*original_thunks & 0x8000000000000000)
-               *import_addrs = (std::uintptr_t)get_proc_address(module, MAKEINTRESOURCE(*original_thunks & 0xFFFF));
+               *import_addrs = (std::uintptr_t)get_proc_address_win32(module, MAKEINTRESOURCE(*original_thunks & 0xFFFF));
             else {
                PIMAGE_IMPORT_BY_NAME import_by_name = (PIMAGE_IMPORT_BY_NAME)&base_u8[*original_thunks];
-               *import_addrs = (std::uintptr_t)get_proc_address(module, import_by_name->Name);
+               *import_addrs = (std::uintptr_t)get_proc_address_win32(module, import_by_name->Name);
             }
             ++import_addrs;
             ++original_thunks;
