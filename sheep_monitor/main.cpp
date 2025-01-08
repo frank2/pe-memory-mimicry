@@ -131,14 +131,14 @@ SheepConfig *GLOBAL_CONFIG = nullptr;
 std::uint8_t *get_proc_address(std::uint8_t *module, const char *func) {
    PIMAGE_NT_HEADERS64 nt_headers = get_nt_headers(module);
    PIMAGE_DATA_DIRECTORY export_dir_info = &nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
-   PIMAGE_EXPORT_DIRECTORY export_dir = (PIMAGE_EXPORT_DIRECTORY)&image_base[export_dir_info->VirtualAddress];
+   PIMAGE_EXPORT_DIRECTORY export_dir = (PIMAGE_EXPORT_DIRECTORY)&module[export_dir_info->VirtualAddress];
 
-   DWORD *functions = (DWORD *)&image_base[export_dir->AddressOfFunctions];
-   DWORD *names = (DWORD *)&image_base[export_dir->AddressOfNames];
-   WORD *name_ordinals = (WORD *)&image_base[export_dir->AddressOfNameOrdinals];
+   DWORD *functions = (DWORD *)&module[export_dir->AddressOfFunctions];
+   DWORD *names = (DWORD *)&module[export_dir->AddressOfNames];
+   WORD *name_ordinals = (WORD *)&module[export_dir->AddressOfNameOrdinals];
 
    for (std::size_t i=0; i<export_dir->NumberOfNames; ++i) {
-      const char *target_func = (const char *)&image_base[names[i]];
+      const char *target_func = (const char *)&module[names[i]];
       const char *func_copy = func;
       bool found = true;
 
