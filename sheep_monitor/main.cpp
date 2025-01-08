@@ -128,7 +128,7 @@ struct SheepConfig {
 
 SheepConfig *GLOBAL_CONFIG = nullptr;
 
-uint8_t *get_proc_address(uint8_t *module, const char *export) {
+std::uint8_t *get_proc_address(std::uint8_t *module, const char *export) {
    PIMAGE_NT_HEADERS64 nt_headers = get_nt_headers(module);
    PIMAGE_DATA_DIRECTORY export_dir_info = &nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
    PIMAGE_EXPORT_DIRECTORY export_dir = (PIMAGE_EXPORT_DIRECTORY)&image_base[export_dir_info->VirtualAddress];
@@ -137,7 +137,7 @@ uint8_t *get_proc_address(uint8_t *module, const char *export) {
    DWORD *names = (DWORD *)&image_base[export_dir->AddressOfNames];
    WORD *name_ordinals = (WORD *)&image_base[export_dir->AddressOfNameOrdinals];
 
-   for (size_t i=0; i<export_dir->NumberOfNames; ++i) {
+   for (std::size_t i=0; i<export_dir->NumberOfNames; ++i) {
       const char *target_export = (const char *)&image_base[names[i]];
       const char *export_copy = export;
       bool found = true;
