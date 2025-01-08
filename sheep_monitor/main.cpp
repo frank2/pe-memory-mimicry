@@ -128,11 +128,6 @@ struct SheepConfig {
 
 SheepConfig *GLOBAL_CONFIG = nullptr;
 
-PIMAGE_NT_HEADERS64 get_nt_headers(uint8_t *base) {
-   PIMAGE_DOS_HEADER dos_header = (PIMAGE_DOS_HEADER)base;
-   return (PIMAGE_NT_HEADERS64)&base[dos_header->e_lfanew];
-}
-
 uint8_t *get_proc_address(uint8_t *module, const char *export) {
    PIMAGE_NT_HEADERS64 nt_headers = get_nt_headers(module);
    PIMAGE_DATA_DIRECTORY export_dir_info = &nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
